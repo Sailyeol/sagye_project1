@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InfoParity | 투자 정보 비대칭 해소 SaaS</title>
+  <style>
+    :root {
+      --navy-950: #050b18;
+      --navy-900: #071326;
+      --navy-850: #0b1b36;
+      --navy-800: #10284f;
+      --navy-700: #163b73;
+      --navy-100: #eaf3ff;
+      --ink: #0b1b32;
+      --muted: #66758b;
+      --line: rgba(15, 39, 75, 0.11);
+      --surface: rgba(255, 255, 255, 0.88);
+      --surface-soft: #f4f8fd;
+      --blue: #3b82ff;
+      --cyan: #18d1ff;
+      --green: #20c997;
+      --amber: #f8b84e;
+      --rose: #ff5f7e;
+      --shadow: 0 22px 70px rgba(5, 17, 38, 0.15);
+      --radius: 8px;
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(24, 209, 255, 0.08), transparent 24%),
+        linear-gradient(180deg, #f7fbff 0%, #eef5ff 42%, #ffffff 100%);
+      line-height: 1.55;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(rgba(10, 31, 56, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(10, 31, 56, 0.025) 1px, transparent 1px);
+      background-size: 36px 36px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(124, 197, 255, 0.16);
+      background: rgba(5, 13, 28, 0.88);
+      color: #fff;
+      backdrop-filter: blur(20px);
+    }
+
+    .topbar-inner {
+      width: min(100% - 32px, var(--max));
+      height: 68px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: max-content;
+      font-weight: 800;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #366bff, var(--cyan));
+      box-shadow: 0 10px 28px rgba(24, 209, 255, 0.28);
+    }
+
+    .brand-mark svg {
+      width: 20px;
+      height: 20px;
+      stroke: #fff;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    .nav-scroll {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+      min-width: 0;
+      padding: 6px 0;
+    }
+
+    .nav-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-link {
+      white-space: nowrap;
+      color: rgba(255, 255, 255, 0.66);
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+      transition: 180ms ease;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: #fff;
+      background: rgba(59, 130, 255, 0.18);
+      box-shadow: inset 0 0 0 1px rgba(24, 209, 255, 0.12);
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 12px;
+      border: 1px solid rgba(124, 197, 255, 0.2);
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 6px rgba(16, 166, 106, 0.18);
+    }
+
+    main {
+      width: min(100% - 32px, var(--max));
+      margin: 0 auto;
+    }
+
+    section {
+      scroll-margin-top: 92px;
+      padding: 74px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow {
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      margin: 0 0 8px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: clamp(40px, 5vw, 72px);
+      line-height: 1.05;
+      margin-bottom: 20px;
+      color: #fff;
+      max-width: 720px;
+      word-break: keep-all;
+    }
+
+    h2 {
+      font-size: clamp(27px, 3vw, 40px);
+      line-height: 1.15;
+      margin-bottom: 0;
+      color: #0d2138;
+      word-break: keep-all;
+    }
+
+    h3 {
+      font-size: 18px;
+      line-height: 1.25;
+      margin-bottom: 10px;
+      word-break: keep-all;
+    }
+
+    .subcopy {
+      color: rgba(235, 245, 255, 0.78);
+      font-size: clamp(16px, 2vw, 20px);
+      max-width: 640px;
+      margin-bottom: 0;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .workspace {
+      min-height: calc(100vh - 68px);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 22px;
+      align-items: stretch;
+      padding: 32px 0 54px;
+    }
+
+    .hero-panel {
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      padding: clamp(28px, 5vw, 54px);
+      background:
+        linear-gradient(125deg, rgba(24, 209, 255, 0.16), transparent 34%),
+        linear-gradient(145deg, var(--navy-950), var(--navy-850) 50%, #123b72);
+      color: #fff;
+      border: 1px solid rgba(124, 197, 255, 0.16);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-panel::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(115deg, transparent 0 58%, rgba(255, 255, 255, 0.08) 58% 59%, transparent 59%),
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: auto, 42px 42px, 42px 42px;
+      opacity: 0.72;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 28px;
+    }
+
+    .command-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .input-shell {
+      flex: 1 1 280px;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(124, 197, 255, 0.22);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+
+    .input-shell svg {
+      width: 18px;
+      height: 18px;
+      stroke: rgba(255, 255, 255, 0.72);
+      fill: none;
+      stroke-width: 2;
+      flex: 0 0 auto;
+    }
+
+    .input-shell input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      outline: 0;
+      color: #fff;
+    }
+
+    .input-shell input::placeholder {
+      color: rgba(255, 255, 255, 0.58);
+    }
+
+    .segment {
+      display: inline-grid;
+      grid-auto-flow: column;
+      gap: 4px;
+      padding: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+    }
+
+    .segment button {
+      min-width: 78px;
+      padding: 9px 10px;
+      border-radius: 6px;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.7);
+      transition: 160ms ease;
+    }
+
+    .segment button.active {
+      color: var(--navy-950);
+      background: linear-gradient(135deg, #fff, #dff7ff);
+      box-shadow: 0 10px 24px rgba(24, 209, 255, 0.2);
+    }
+
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .signal-card {
+      min-height: 128px;
+      padding: 18px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.085);
+      border: 1px solid rgba(124, 197, 255, 0.18);
+      backdrop-filter: blur(12px);
+    }
+
+    .signal-card strong {
+      display: block;
+      font-size: 30px;
+      line-height: 1;
+      margin: 14px 0 8px;
+    }
+
+    .signal-card span,
+    .signal-card small {
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .glass-card {
+      border-radius: 8px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(124, 197, 255, 0.18);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .score-ring {
+      --score: 64;
+      --ring-color: var(--blue);
+      width: 174px;
+      aspect-ratio: 1;
+      margin: 8px auto 18px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at center, #fff 58%, transparent 59%),
+        conic-gradient(var(--ring-color) calc(var(--score) * 1%), rgba(15, 40, 70, 0.08) 0);
+      box-shadow: inset 0 0 0 1px rgba(17, 43, 76, 0.07);
+    }
+
+    .score-ring strong {
+      font-size: 42px;
+      line-height: 1;
+    }
+
+    .tiny-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .source-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: #eaf5ff;
+      color: #174777;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .source-chip::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--blue);
+    }
+
+    .data-grid,
+    .two-col,
+    .three-col {
+      display: grid;
+      gap: 16px;
+    }
+
+    .data-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .two-col {
+      grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+      align-items: stretch;
+    }
+
+    .three-col {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 14px 44px rgba(12, 35, 62, 0.08);
+      backdrop-filter: blur(12px);
+    }
+
+    .data-grid > *,
+    .two-col > *,
+    .three-col > *,
+    .knowledge-grid > *,
+    .scenario-grid > *,
+    .redflag-grid > *,
+    .choice-shell > *,
+    .claim-tool > * {
+      min-width: 0;
+    }
+
+    .metric-card {
+      padding: 20px;
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(59, 130, 255, 0.22);
+      box-shadow: 0 18px 56px rgba(12, 35, 62, 0.12);
+    }
+
+    .metric-card .value {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin: 12px 0 10px;
+      font-size: 32px;
+      font-weight: 800;
+      color: #0c2036;
+    }
+
+    .delta {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .delta.down {
+      color: var(--rose);
+    }
+
+    .spark {
+      width: 100%;
+      height: 46px;
+      margin-top: 8px;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .panel.dark {
+      color: #fff;
+      background:
+        linear-gradient(135deg, rgba(24, 209, 255, 0.14), transparent 46%),
+        var(--navy-900);
+      border-color: rgba(124, 197, 255, 0.16);
+      box-shadow: 0 18px 70px rgba(7, 17, 31, 0.18);
+    }
+
+    .panel.dark h3,
+    .panel.dark .big-number {
+      color: #fff;
+    }
+
+    .panel.dark .muted,
+    .panel.dark p,
+    .panel.dark li {
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .chart-area {
+      min-height: 240px;
+      display: grid;
+      align-content: end;
+      gap: 14px;
+    }
+
+    .bar-chart {
+      height: 210px;
+      display: grid;
+      grid-template-columns: repeat(12, minmax(10px, 1fr));
+      gap: 9px;
+      align-items: end;
+      padding-top: 18px;
+    }
+
+    .bar {
+      position: relative;
+      min-height: 18px;
+      border-radius: 6px 6px 2px 2px;
+      background: linear-gradient(180deg, var(--cyan), var(--blue));
+      transition: height 450ms ease;
+    }
+
+    .bar::after {
+      content: attr(data-label);
+      position: absolute;
+      left: 50%;
+      bottom: -24px;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 11px;
+    }
+
+    .callout-list {
+      display: grid;
+      gap: 10px;
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .callout-list li {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .num {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      box-shadow: 0 8px 18px rgba(59, 130, 255, 0.2);
+    }
+
+    .big-number {
+      font-size: clamp(42px, 8vw, 82px);
+      font-weight: 900;
+      line-height: 0.96;
+      color: #0d2138;
+    }
+
+    .vix-meter {
+      display: grid;
+      gap: 18px;
+    }
+
+    .range {
+      position: relative;
+      height: 16px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--green), var(--amber), var(--rose));
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+    }
+
+    .range-pin {
+      position: absolute;
+      top: 50%;
+      left: 40%;
+      width: 22px;
+      height: 22px;
+      transform: translate(-50%, -50%);
+      border: 4px solid #fff;
+      border-radius: 50%;
+      background: #0c2036;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.24);
+    }
+
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .table th,
+    .table td {
+      padding: 15px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    .table th {
+      color: #4c6078;
+      font-size: 13px;
+      background: #f6f9fd;
+    }
+
+    .table-wrap {
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    .table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: #eaf5ff;
+      color: #174777;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .tag.green {
+      color: #0d7049;
+      background: #e7f8f1;
+    }
+
+    .tag.amber {
+      color: #8b5a04;
+      background: #fff3d9;
+    }
+
+    .tag.rose {
+      color: #a53149;
+      background: #ffebf0;
+    }
+
+    .knowledge-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .knowledge {
+      padding: 20px;
+      min-height: 188px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .knowledge .formula {
+      color: #0b3f75;
+      background: linear-gradient(135deg, #eaf5ff, #effbff);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+      position: relative;
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 14px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 10px 30px rgba(12, 35, 62, 0.06);
+    }
+
+    .event time {
+      color: var(--blue);
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .choice-shell {
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      gap: 16px;
+    }
+
+    .choice-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .choice-button {
+      text-align: left;
+      padding: 16px;
+      border-radius: 8px;
+      color: #33465c;
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid var(--line);
+      transition: 180ms ease;
+    }
+
+    .choice-button.active {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--navy-900), var(--navy-700) 68%, #0b72ff);
+      box-shadow: var(--shadow);
+    }
+
+    .allocation {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .alloc-item {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #f8fbff, #eef8ff);
+    }
+
+    .alloc-item strong {
+      display: block;
+      font-size: 24px;
+      margin-top: 8px;
+      color: #0d2138;
+    }
+
+    .checks {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 0;
+      margin: 18px 0 0;
+      list-style: none;
+    }
+
+    .checks li {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      color: #40546c;
+    }
+
+    .checkmark {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      color: #fff;
+      font-size: 12px;
+      background: var(--green);
+      margin-top: 2px;
+    }
+
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .scenario {
+      padding: 22px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+      min-height: 240px;
+    }
+
+    .scenario .impact {
+      height: 8px;
+      border-radius: 999px;
+      background: #edf2f8;
+      overflow: hidden;
+    }
+
+    .scenario .impact span {
+      display: block;
+      height: 100%;
+      width: var(--w);
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--blue));
+    }
+
+    .redflag-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .redflag {
+      padding: 18px;
+      min-height: 170px;
+      display: grid;
+      align-content: start;
+      gap: 9px;
+    }
+
+    .redflag b {
+      font-size: 26px;
+      color: var(--rose);
+    }
+
+    .claim-tool {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .textarea-like {
+      width: 100%;
+      min-height: 142px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      outline: none;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .primary-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--blue), #18a9ff);
+      font-weight: 850;
+      box-shadow: 0 14px 32px rgba(59, 130, 255, 0.28);
+    }
+
+    .insight-box {
+      padding: 18px;
+      border-radius: 8px;
+      background: #f6f9fd;
+      border: 1px solid var(--line);
+    }
+
+    .insight-box strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #0d2138;
+    }
+
+    .footer {
+      padding: 38px 0 48px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-inner {
+      width: min(100% - 32px, var(--max));
+      margin: 0 auto;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity 700ms ease, transform 700ms ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .stagger > * {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 650ms ease, transform 650ms ease;
+    }
+
+    .stagger.is-visible > * {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .stagger.is-visible > *:nth-child(2) {
+      transition-delay: 70ms;
+    }
+
+    .stagger.is-visible > *:nth-child(3) {
+      transition-delay: 140ms;
+    }
+
+    .stagger.is-visible > *:nth-child(4) {
+      transition-delay: 210ms;
+    }
+
+    @media (max-width: 1020px) {
+      .workspace,
+      .two-col,
+      .choice-shell,
+      .claim-tool {
+        grid-template-columns: 1fr;
+      }
+
+      .data-grid,
+      .redflag-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .side-stack {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar-inner {
+        width: min(100% - 20px, var(--max));
+        height: auto;
+        padding: 10px 0;
+        flex-wrap: wrap;
+      }
+
+      .brand {
+        width: 100%;
+      }
+
+      .status-pill {
+        display: none;
+      }
+
+      main {
+        width: min(100% - 20px, var(--max));
+      }
+
+      section {
+        padding: 48px 0;
+      }
+
+      .workspace {
+        min-height: auto;
+        padding-top: 18px;
+      }
+
+      .hero-panel {
+        padding: 26px 18px;
+      }
+
+      h1 {
+        font-size: clamp(34px, 10vw, 44px);
+      }
+
+      .signal-grid,
+      .data-grid,
+      .three-col,
+      .knowledge-grid,
+      .scenario-grid,
+      .redflag-grid,
+      .allocation,
+      .checks,
+      .side-stack {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .segment {
+        width: 100%;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .segment button {
+        min-width: 0;
+      }
+
+      .event {
+        grid-template-columns: 1fr;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      .table {
+        min-width: 640px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition: none !important;
+        animation: none !important;
+      }
+
+      .reveal,
+      .stagger > * {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#desk" aria-label="InfoParity 홈">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 17V7m0 10h16M8 14l3-4 3 3 5-7"/></svg>
+        </span>
+        <span>InfoParity</span>
+      </a>
+      <nav class="nav-scroll" aria-label="주요 섹션">
+        <a class="nav-link active" href="#desk">데스크</a>
+        <a class="nav-link" href="#market">시장 요약</a>
+        <a class="nav-link" href="#vix">VIX</a>
+        <a class="nav-link" href="#feargreed">Fear & Greed</a>
+        <a class="nav-link" href="#asymmetry">정보 격차</a>
+        <a class="nav-link" href="#basics">기본 지표</a>
+        <a class="nav-link" href="#events">공시·뉴스</a>
+        <a class="nav-link" href="#profile">투자 성향</a>
+        <a class="nav-link" href="#scenario">시나리오</a>
+        <a class="nav-link" href="#redflags">레드플래그</a>
+      </nav>
+      <div class="status-pill">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="topStatus">데이터 대기 중</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="desk" class="workspace">
+      <div class="hero-panel reveal">
+        <div class="hero-content">
+          <div>
+            <p class="eyebrow">INVESTMENT CLARITY DESK</p>
+            <h1>정보 격차, 한 화면에서 좁히기</h1>
+            <p class="subcopy">VIX, 심리, 공시, 밸류에이션을 빠르게 읽고 내 성향에 맞게 필터링.</p>
+          </div>
+          <div class="command-row" aria-label="검색 및 관점 선택">
+            <label class="input-shell">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+              <input id="queryInput" type="text" placeholder="궁금한 종목·이슈를 입력하세요" />
+            </label>
+            <div class="segment" role="tablist" aria-label="정보 밀도">
+              <button class="density active" type="button" data-mode="fast">빠르게</button>
+              <button class="density" type="button" data-mode="balanced">균형</button>
+              <button class="density" type="button" data-mode="deep">깊게</button>
+            </div>
+          </div>
+          <div class="signal-grid stagger">
+            <article class="signal-card">
+              <span>오늘 볼 것</span>
+              <strong id="priorityScore">82</strong>
+              <small>VIX · 심리 · 실적</small>
+            </article>
+            <article class="signal-card">
+              <span>신뢰 레이어</span>
+              <strong>4.6</strong>
+              <small>공시·거래소 우선</small>
+            </article>
+            <article class="signal-card">
+              <span>난이도</span>
+              <strong>중간</strong>
+              <small>핵심만 압축</small>
+            </article>
+            <article class="signal-card">
+              <span>체크 질문</span>
+              <strong>3개</strong>
+              <small>매수 전 확인</small>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <aside class="side-stack">
+        <article class="glass-card reveal">
+          <div class="tiny-label">
+            <span>Market Clarity</span>
+            <span class="source-chip">모델</span>
+          </div>
+          <div class="score-ring" id="clarityRing" style="--score: 68; --ring-color: #2f80ff">
+            <strong id="clarityValue">68</strong>
+          </div>
+          <h3 id="clarityTitle">맥락은 보임, 감정은 혼재</h3>
+          <p class="muted" id="clarityCopy">숫자와 원인을 먼저 봅니다.</p>
+        </article>
+
+        <article class="glass-card reveal">
+          <div class="tiny-label">
+            <span>5분 체크</span>
+            <span class="tag green">5분</span>
+          </div>
+          <ul class="callout-list">
+            <li><span class="num">1</span><span>변동성: 이벤트인가 추세인가</span></li>
+            <li><span class="num">2</span><span>이익: 기대보다 빠른가</span></li>
+            <li><span class="num">3</span><span>손실: 견딜 수 있는가</span></li>
+          </ul>
+        </article>
+      </aside>
+    </section>
+
+    <section id="market">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">01 MARKET SNAPSHOT</p>
+          <h2>지금 시장, 4개 신호만 먼저</h2>
+        </div>
+        <span class="source-chip">실시간 시도 + 예시 데이터</span>
+      </div>
+      <div class="data-grid stagger">
+        <article class="card metric-card">
+          <div class="tiny-label"><span>S&P 500 흐름</span><span class="tag green">추세</span></div>
+          <div class="value">+0.42% <span class="delta">위험 선호</span></div>
+          <p class="muted">오른 종목의 폭을 봅니다.</p>
+          <svg class="spark" viewBox="0 0 160 46" preserveAspectRatio="none">
+            <path d="M0 36 C20 28 28 32 42 24 S68 12 82 20 104 32 122 18 146 11 160 8" fill="none" stroke="#2f80ff" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+        </article>
+        <article class="card metric-card">
+          <div class="tiny-label"><span>미국 10년 금리</span><span class="tag amber">할인율</span></div>
+          <div class="value">4.31% <span class="delta down">성장주 압박</span></div>
+          <p class="muted">성장주 할인율 압박.</p>
+          <svg class="spark" viewBox="0 0 160 46" preserveAspectRatio="none">
+            <path d="M0 30 C18 32 32 18 48 22 S74 36 90 26 116 12 132 16 150 22 160 14" fill="none" stroke="#f5a524" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+        </article>
+        <article class="card metric-card">
+          <div class="tiny-label"><span>달러 인덱스</span><span class="tag">유동성</span></div>
+          <div class="value">104.2 <span class="delta">중립</span></div>
+          <p class="muted">유동성의 방향을 읽습니다.</p>
+          <svg class="spark" viewBox="0 0 160 46" preserveAspectRatio="none">
+            <path d="M0 24 C20 16 34 18 48 28 S78 31 92 20 112 15 126 24 148 34 160 26" fill="none" stroke="#14b8d4" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+        </article>
+        <article class="card metric-card">
+          <div class="tiny-label"><span>실적 모멘텀</span><span class="tag green">EPS</span></div>
+          <div class="value">+7.8% <span class="delta">상향</span></div>
+          <p class="muted">가격보다 EPS 속도.</p>
+          <svg class="spark" viewBox="0 0 160 46" preserveAspectRatio="none">
+            <path d="M0 40 C22 38 30 28 46 30 S70 34 86 22 104 10 120 16 144 18 160 6" fill="none" stroke="#10a66a" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+        </article>
+      </div>
+    </section>
+
+    <section id="vix">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">02 VIX RISK RADAR</p>
+          <h2>공포는 레벨보다 속도</h2>
+        </div>
+        <span class="source-chip" id="vixSource">Yahoo Finance Chart API</span>
+      </div>
+      <div class="two-col">
+        <article class="card panel dark reveal">
+          <div class="tiny-label">
+            <span>Cboe Volatility Index</span>
+            <span id="vixTime">연동 대기</span>
+          </div>
+          <div class="vix-meter">
+            <div>
+              <div class="big-number" id="vixValue">--</div>
+              <p id="vixNarrative">실시간 값을 확인 중입니다.</p>
+            </div>
+            <div>
+              <div class="range" aria-label="VIX 위험 구간">
+                <span class="range-pin" id="vixPin"></span>
+              </div>
+              <div class="range-labels">
+                <span>안정 12</span>
+                <span>주의 20</span>
+                <span>위기 35+</span>
+              </div>
+            </div>
+            <div class="chart-area">
+              <div class="bar-chart" id="vixBars" aria-label="최근 VIX 추이"></div>
+            </div>
+          </div>
+        </article>
+        <article class="card panel reveal">
+          <h3>VIX 읽는 법</h3>
+          <ul class="callout-list">
+            <li><span class="num">A</span><span><b>20</b> 이상이면 방어 모드</span></li>
+            <li><span class="num">B</span><span><b>급등</b>보다 누적 상승</span></li>
+            <li><span class="num">C</span><span><b>원인</b>은 금리·실적·이벤트</span></li>
+            <li><span class="num">D</span><span><b>행동</b>은 비중부터 조정</span></li>
+          </ul>
+          <div class="insight-box" style="margin-top: 18px;">
+            <strong>정보 비대칭 포인트</strong>
+            가격 뉴스만 보면 늦습니다. VIX로 리스크 비용을 먼저 봅니다.
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="feargreed">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">03 FEAR & GREED INDEX</p>
+          <h2>탐욕과 공포를 분해해서 보기</h2>
+        </div>
+        <span class="source-chip" id="fgSource">CNN 데이터 연동</span>
+      </div>
+      <div class="two-col">
+        <article class="card panel reveal">
+          <div class="score-ring" id="fgRing" style="--score: 50; --ring-color: #f5a524">
+            <strong id="fgValue">--</strong>
+          </div>
+          <h3 id="fgRating">데이터 확인 중</h3>
+          <p class="muted" id="fgCopy">숫자보다 구성 요소의 방향.</p>
+          <div class="range-labels">
+            <span>Extreme Fear</span>
+            <span>Neutral</span>
+            <span>Extreme Greed</span>
+          </div>
+        </article>
+        <article class="card panel reveal">
+          <h3>심리 구성표</h3>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>지표</th>
+                  <th>해석</th>
+                  <th>투자자가 볼 것</th>
+                </tr>
+              </thead>
+              <tbody id="fgComponents">
+                <tr><td>Market Momentum</td><td>중립</td><td>S&P 500과 이동평균 괴리</td></tr>
+                <tr><td>Stock Price Strength</td><td>중립</td><td>52주 신고가와 신저가</td></tr>
+                <tr><td>Market Volatility</td><td>주의</td><td>VIX 방향과 급등 속도</td></tr>
+                <tr><td>Safe Haven Demand</td><td>확인</td><td>주식 대비 채권 선호</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="asymmetry">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">04 INFORMATION GAP MAP</p>
+          <h2>정보 격차는 여기서 벌어진다</h2>
+        </div>
+      </div>
+      <div class="three-col stagger">
+        <article class="card panel">
+          <span class="tag">원문 접근</span>
+          <h3>요약보다 원문</h3>
+          <p class="muted">공시·IR·실적 콜부터 봅니다.</p>
+          <ul class="callout-list">
+            <li><span class="num">1</span><span>신규 계약 규모와 매출 인식 시점</span></li>
+            <li><span class="num">2</span><span>가이던스 상향·하향 이유</span></li>
+          </ul>
+        </article>
+        <article class="card panel">
+          <span class="tag amber">기대치</span>
+          <h3>좋은 뉴스도 비쌀 수 있다</h3>
+          <p class="muted">핵심은 기대 대비 차이.</p>
+          <ul class="callout-list">
+            <li><span class="num">1</span><span>컨센서스 대비 매출·EPS 차이</span></li>
+            <li><span class="num">2</span><span>발표 후 거래량과 변동성</span></li>
+          </ul>
+        </article>
+        <article class="card panel">
+          <span class="tag green">전략 필터</span>
+          <h3>내 전략 밖은 소음</h3>
+          <p class="muted">성향별로 볼 지표가 달라집니다.</p>
+          <ul class="callout-list">
+            <li><span class="num">1</span><span>보유 기간과 손실 허용폭</span></li>
+            <li><span class="num">2</span><span>지표 우선순위 자동 정렬</span></li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="basics">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">05 INVESTMENT BASICS</p>
+          <h2>기본 지표, 한 줄 해석</h2>
+        </div>
+      </div>
+      <div class="knowledge-grid stagger">
+        <article class="card knowledge">
+          <span class="tag">PER</span>
+          <h3>이익 대비 가격</h3>
+          <div class="formula">PER = 시가총액 / 순이익</div>
+          <p class="muted">성장률이 꺾이면 프리미엄도 꺾입니다.</p>
+        </article>
+        <article class="card knowledge">
+          <span class="tag">PBR</span>
+          <h3>자산 대비 가격</h3>
+          <div class="formula">PBR = 시가총액 / 순자산</div>
+          <p class="muted">자산주에는 강하고 플랫폼에는 약함.</p>
+        </article>
+        <article class="card knowledge">
+          <span class="tag green">ROE</span>
+          <h3>자본 효율</h3>
+          <div class="formula">ROE = 순이익 / 자기자본</div>
+          <p class="muted">부채 효과인지 경쟁력인지 분리.</p>
+        </article>
+        <article class="card knowledge">
+          <span class="tag amber">FCF</span>
+          <h3>진짜 현금</h3>
+          <div class="formula">FCF = 영업현금흐름 - 설비투자</div>
+          <p class="muted">배당·자사주·재투자의 연료.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="events">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">06 DISCLOSURE & NEWS FLOW</p>
+          <h2>뉴스보다 빠른 숫자 루틴</h2>
+        </div>
+      </div>
+      <div class="timeline stagger">
+        <article class="event">
+          <time>장전</time>
+          <div>
+            <h3>공시와 리포트 차이</h3>
+            <p class="muted">목표가보다 가정 변화를 봅니다.</p>
+          </div>
+        </article>
+        <article class="event">
+          <time>장중</time>
+          <div>
+            <h3>급등락 원인 분리</h3>
+            <p class="muted">개별 이슈인가, 섹터 수급인가.</p>
+          </div>
+        </article>
+        <article class="event">
+          <time>장후</time>
+          <div>
+            <h3>실적 후 가이던스</h3>
+            <p class="muted">매출, EPS, 마진만 먼저 봅니다.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="profile">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">07 INVESTOR FIT</p>
+          <h2>성향별로 다른 정답</h2>
+        </div>
+      </div>
+      <div class="choice-shell">
+        <div class="choice-list reveal" role="tablist" aria-label="투자 성향">
+          <button class="choice-button active" type="button" data-profile="stable">안정형<br><span class="muted">방어와 현금흐름</span></button>
+          <button class="choice-button" type="button" data-profile="balanced">균형형<br><span class="muted">ETF와 우량주</span></button>
+          <button class="choice-button" type="button" data-profile="growth">성장형<br><span class="muted">성장률과 확장성</span></button>
+          <button class="choice-button" type="button" data-profile="active">액티브형<br><span class="muted">이벤트와 변동성</span></button>
+        </div>
+        <article class="card panel reveal">
+          <span class="tag" id="profileTag">안정형</span>
+          <h3 id="profileTitle">원금 변동폭을 작게 유지하는 구조</h3>
+          <p class="muted" id="profileCopy">배당, 채권형 ETF, 현금성 자산을 통해 급락장에서 매수 여력을 남깁니다.</p>
+          <div class="allocation" id="allocation"></div>
+          <ul class="checks" id="profileChecks"></ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="scenario">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">08 SCENARIO LAB</p>
+          <h2>이벤트별 반응 지도</h2>
+        </div>
+      </div>
+      <div class="scenario-grid stagger">
+        <article class="card scenario">
+          <span class="tag rose">금리 상승</span>
+          <h3>성장주 압박</h3>
+          <p class="muted">먼 미래 이익일수록 민감.</p>
+          <div class="impact"><span style="--w: 78%"></span></div>
+          <small class="muted">민감도 높음</small>
+        </article>
+        <article class="card scenario">
+          <span class="tag amber">VIX 급등</span>
+          <h3>주문 단위 축소</h3>
+          <p class="muted">현금과 손실 기준 먼저.</p>
+          <div class="impact"><span style="--w: 64%"></span></div>
+          <small class="muted">민감도 중간</small>
+        </article>
+        <article class="card scenario">
+          <span class="tag green">실적 상향</span>
+          <h3>EPS 속도 확인</h3>
+          <p class="muted">가격보다 전망 상향이 빠른가.</p>
+          <div class="impact"><span style="--w: 52%"></span></div>
+          <small class="muted">확인 필요</small>
+        </article>
+      </div>
+    </section>
+
+    <section id="redflags">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">09 RED FLAG CHECKLIST</p>
+          <h2>먼저 거를 신호</h2>
+        </div>
+      </div>
+      <div class="redflag-grid stagger">
+        <article class="card redflag">
+          <b>01</b>
+          <h3>매출은 증가, 현금은 감소</h3>
+          <p class="muted">채권·재고 확인.</p>
+        </article>
+        <article class="card redflag">
+          <b>02</b>
+          <h3>호재 뉴스 후 내부자 매도</h3>
+          <p class="muted">시점·규모·반복성.</p>
+        </article>
+        <article class="card redflag">
+          <b>03</b>
+          <h3>가이던스 없는 장밋빛 표현</h3>
+          <p class="muted">숫자 없는 스토리.</p>
+        </article>
+        <article class="card redflag">
+          <b>04</b>
+          <h3>섹터 대비 과도한 거래량</h3>
+          <p class="muted">수급인지 구조 변화인지.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="claim">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">10 CLAIM CHECKER</p>
+          <h2>투자 주장, 질문으로 바꾸기</h2>
+        </div>
+      </div>
+      <div class="claim-tool">
+        <article class="card panel reveal">
+          <textarea id="claimInput" class="textarea-like" placeholder="예: AI 수혜주라 계속 오를까?"></textarea>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+            <button class="primary-button" id="claimButton" type="button">
+              <span>검증 질문 생성</span>
+            </button>
+            <span class="tag amber">교육용</span>
+          </div>
+        </article>
+        <aside class="insight-box reveal" id="claimResult">
+          <strong>검증 결과</strong>
+          원문, 숫자, 기대치, 손실 기준만 남깁니다.
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <strong>InfoParity Prototype</strong>
+      <p>정보 비대칭 해소를 위한 SaaS UI 프로토타입. 모든 내용은 교육용 예시입니다.</p>
+    </div>
+  </footer>
+
+  <script>
+    const fallbackVix = [14.8, 15.2, 16.1, 15.9, 17.8, 18.5, 20.1, 19.4, 18.2, 21.7, 22.4, 20.8];
+    const fallbackFearGreed = {
+      value: 42,
+      rating: "Fear",
+      components: [
+        ["Market Momentum", "Fear", "S&P 500과 125일 이동평균 비교"],
+        ["Stock Price Strength", "Neutral", "신고가/신저가 확산 여부"],
+        ["Market Volatility", "Fear", "VIX 레벨과 방향"],
+        ["Junk Bond Demand", "Neutral", "고위험 채권 스프레드"],
+        ["Safe Haven Demand", "Fear", "주식 대비 채권 선호"]
+      ]
+    };
+
+    const profileData = {
+      stable: {
+        tag: "안정형",
+        title: "방어선을 먼저 세우는 구조",
+        copy: "현금흐름과 낮은 변동성을 우선합니다.",
+        allocation: [["현금", 25], ["채권/채권 ETF", 35], ["배당주", 25], ["성장주", 15]],
+        checks: ["월 손실 3% 이내", "개별 종목 10% 이하", "배당 지속성 확인", "VIX 25 이상 방어"]
+      },
+      balanced: {
+        tag: "균형형",
+        title: "시장 평균에 기회를 더하는 구조",
+        copy: "ETF를 중심에 두고 우량주를 보조로 둡니다.",
+        allocation: [["현금", 15], ["시장 ETF", 45], ["우량주", 25], ["테마/성장", 15]],
+        checks: ["리밸런싱 고정", "섹터 쏠림 제한", "실적 시즌 점검", "뉴스와 목표 분리"]
+      },
+      growth: {
+        tag: "성장형",
+        title: "성장률을 가장 먼저 보는 구조",
+        copy: "고평가보다 성장 둔화 신호가 더 중요합니다.",
+        allocation: [["현금", 10], ["시장 ETF", 25], ["성장주", 45], ["혁신 테마", 20]],
+        checks: ["매출 둔화 확인", "EPS 상향률 우선", "금리 민감도 점검", "손실 기준 입력"]
+      },
+      active: {
+        tag: "액티브형",
+        title: "이벤트를 짧게 처리하는 구조",
+        copy: "공시, 수급, 변동성을 빠른 루프로 봅니다.",
+        allocation: [["현금", 30], ["단기 이벤트", 30], ["핵심 ETF", 20], ["헤지/대체", 20]],
+        checks: ["청산가 선입력", "거래량 원인 분리", "VIX·옵션만기 확인", "일 손실 한도 고정"]
+      }
+    };
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+    function setStatus(message, isLive = true) {
+      $("#topStatus").textContent = message;
+      const dot = $(".status-dot");
+      dot.style.background = isLive ? "var(--green)" : "var(--amber)";
+      dot.style.boxShadow = isLive
+        ? "0 0 0 6px rgba(16, 166, 106, 0.18)"
+        : "0 0 0 6px rgba(245, 165, 36, 0.18)";
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    function classifyVix(value) {
+      if (value >= 35) return ["위기", "레버리지와 집중도를 낮출 구간입니다."];
+      if (value >= 25) return ["경계", "분할 매수와 손실 제한이 먼저입니다."];
+      if (value >= 20) return ["주의", "신규 진입 근거를 더 엄격히 봅니다."];
+      return ["안정", "낙관보다 밸류에이션을 봅니다."];
+    }
+
+    function renderVix(values, sourceLabel) {
+      const clean = values.filter((v) => Number.isFinite(v));
+      const latest = clean.at(-1) || fallbackVix.at(-1);
+      const previous = clean.at(-2) || latest;
+      const [state, narrative] = classifyVix(latest);
+      const max = Math.max(...clean, 35);
+      const min = Math.min(...clean, 10);
+
+      $("#vixValue").textContent = latest.toFixed(2);
+      $("#vixNarrative").textContent = `${state}: ${narrative}`;
+      $("#vixSource").textContent = sourceLabel;
+      $("#vixTime").textContent = `변화 ${(latest - previous).toFixed(2)}`;
+      $("#vixPin").style.left = `${clamp((latest / 40) * 100, 4, 96)}%`;
+
+      $("#vixBars").innerHTML = clean.slice(-12).map((value, index) => {
+        const h = clamp(((value - min) / (max - min || 1)) * 170 + 24, 18, 198);
+        return `<span class="bar" style="height:${h}px" data-label="${index + 1}"></span>`;
+      }).join("");
+    }
+
+    function fgColor(value) {
+      if (value < 25) return "#ec5f7a";
+      if (value < 45) return "#f5a524";
+      if (value < 56) return "#2f80ff";
+      if (value < 75) return "#10a66a";
+      return "#13b8a6";
+    }
+
+    function formatRating(value) {
+      const text = String(value || "확인").trim();
+      const normalized = text.toLowerCase();
+      const map = {
+        "extreme fear": "Extreme Fear",
+        "fear": "Fear",
+        "neutral": "Neutral",
+        "greed": "Greed",
+        "extreme greed": "Extreme Greed"
+      };
+      return map[normalized] || text;
+    }
+
+    function renderFearGreed(data, sourceLabel) {
+      const value = clamp(Math.round(Number(data.value) || fallbackFearGreed.value), 0, 100);
+      const rating = formatRating(data.rating || fallbackFearGreed.rating);
+      $("#fgValue").textContent = value;
+      $("#fgRating").textContent = rating;
+      $("#fgCopy").textContent = value < 45
+        ? "공포 구간은 원인 분리가 먼저입니다."
+        : value > 65
+          ? "탐욕 구간은 반영된 기대치를 봅니다."
+          : "중립 구간은 업종별 차별화가 핵심입니다.";
+      $("#fgRing").style.setProperty("--score", value);
+      $("#fgRing").style.setProperty("--ring-color", fgColor(value));
+      $("#fgSource").textContent = sourceLabel;
+      $("#clarityRing").style.setProperty("--score", clamp(100 - Math.abs(value - 50), 35, 82));
+      $("#clarityValue").textContent = clamp(100 - Math.abs(value - 50), 35, 82);
+      $("#clarityTitle").textContent = value > 65 ? "낙관 강함, 검증 필요" : value < 35 ? "공포 강함, 원인 분리" : "맥락은 보임, 감정은 혼재";
+
+      const rows = (data.components || fallbackFearGreed.components).slice(0, 6);
+      $("#fgComponents").innerHTML = rows.map(([name, state, watch]) => {
+        const className = /fear|주의|위험/i.test(state) ? "rose" : /greed|상승|강세/i.test(state) ? "green" : "amber";
+        return `<tr><td>${name}</td><td><span class="tag ${className}">${formatRating(state)}</span></td><td>${watch}</td></tr>`;
+      }).join("");
+    }
+
+    async function fetchJson(url, timeout = 4000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeout);
+      try {
+        const response = await fetch(url, { signal: controller.signal, cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return await response.json();
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function loadVix() {
+      const urls = [
+        "https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?range=1mo&interval=1d",
+        "https://api.allorigins.win/raw?url=https%3A%2F%2Fquery1.finance.yahoo.com%2Fv8%2Ffinance%2Fchart%2F%255EVIX%3Frange%3D1mo%26interval%3D1d"
+      ];
+      for (const url of urls) {
+        try {
+          const json = await fetchJson(url);
+          const result = json.chart?.result?.[0];
+          const values = result?.indicators?.quote?.[0]?.close || [];
+          if (values.length) {
+            renderVix(values, url.includes("allorigins") ? "Yahoo Finance via CORS proxy" : "Yahoo Finance Chart API");
+            return true;
+          }
+        } catch (error) {
+          console.info("VIX fetch fallback:", error.message);
+        }
+      }
+      renderVix(fallbackVix, "예시 데이터");
+      return false;
+    }
+
+    async function loadFearGreed() {
+      const cnnUrl = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata";
+      const urls = [
+        cnnUrl,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(cnnUrl)}`
+      ];
+      for (const url of urls) {
+        try {
+          const json = await fetchJson(url);
+          const current = json.fear_and_greed || json.data?.fear_and_greed || {};
+          const value = current.score ?? current.value;
+          const rating = current.rating || current.status || current.classification;
+          const componentKeys = [
+            ["market_momentum_sp500", "Market Momentum", "S&P 500 이동평균 대비 위치"],
+            ["stock_price_strength", "Stock Price Strength", "신고가와 신저가 균형"],
+            ["stock_price_breadth", "Stock Price Breadth", "상승 종목의 폭"],
+            ["put_call_options", "Put/Call Options", "옵션 시장 방어 수요"],
+            ["market_volatility_vix", "Market Volatility", "VIX 레벨과 변화율"],
+            ["junk_bond_demand", "Junk Bond Demand", "하이일드 스프레드"],
+            ["safe_haven_demand", "Safe Haven Demand", "주식 대비 채권 선호"]
+          ];
+          const components = componentKeys
+            .map(([key, name, watch]) => {
+              const item = json[key] || json.fear_and_greed_historical?.[key];
+              const state = item?.rating || item?.status || item?.score || "확인";
+              return [name, String(state), watch];
+            });
+          if (value !== undefined) {
+            renderFearGreed({ value, rating, components }, url.includes("allorigins") ? "CNN via CORS proxy" : "CNN 데이터 연동");
+            return true;
+          }
+        } catch (error) {
+          console.info("Fear & Greed fetch fallback:", error.message);
+        }
+      }
+      renderFearGreed(fallbackFearGreed, "예시 데이터");
+      return false;
+    }
+
+    function renderProfile(key) {
+      const data = profileData[key];
+      $("#profileTag").textContent = data.tag;
+      $("#profileTitle").textContent = data.title;
+      $("#profileCopy").textContent = data.copy;
+      $("#allocation").innerHTML = data.allocation.map(([label, value]) => (
+        `<div class="alloc-item"><span class="muted">${label}</span><strong>${value}%</strong></div>`
+      )).join("");
+      $("#profileChecks").innerHTML = data.checks.map((check) => (
+        `<li><span class="checkmark">✓</span><span>${check}</span></li>`
+      )).join("");
+    }
+
+    function setupInteractions() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add("is-visible");
+        });
+      }, { threshold: 0.16 });
+      $$(".reveal, .stagger").forEach((el) => observer.observe(el));
+
+      const sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          $$(".nav-link").forEach((link) => {
+            link.classList.toggle("active", link.getAttribute("href") === `#${entry.target.id}`);
+          });
+        });
+      }, { rootMargin: "-45% 0px -48% 0px", threshold: 0 });
+      $$("main section[id]").forEach((section) => sectionObserver.observe(section));
+
+      $$(".density").forEach((button) => {
+        button.addEventListener("click", () => {
+          $$(".density").forEach((b) => b.classList.remove("active"));
+          button.classList.add("active");
+          const mode = button.dataset.mode;
+          const score = mode === "fast" ? 82 : mode === "balanced" ? 74 : 66;
+          $("#priorityScore").textContent = score;
+        $("#clarityCopy").textContent = mode === "deep"
+            ? "원문과 출처까지 봅니다."
+            : mode === "balanced"
+              ? "지표와 해석을 같이 봅니다."
+              : "판단 질문만 먼저 봅니다.";
+        });
+      });
+
+      $$(".choice-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          $$(".choice-button").forEach((b) => b.classList.remove("active"));
+          button.classList.add("active");
+          renderProfile(button.dataset.profile);
+        });
+      });
+
+      $("#queryInput").addEventListener("input", (event) => {
+        const value = event.target.value.trim();
+        $("#clarityTitle").textContent = value ? `"${value}" 검증 큐 생성` : "맥락은 보임, 감정은 혼재";
+        $("#clarityCopy").textContent = value
+          ? "가격, 원문, 기대치, 리스크만 봅니다."
+          : "숫자와 원인을 먼저 봅니다.";
+      });
+
+      $("#claimButton").addEventListener("click", () => {
+        const claim = $("#claimInput").value.trim();
+        const base = claim || "입력된 투자 주장";
+        $("#claimResult").innerHTML = `
+          <strong>검증 결과</strong>
+          <p style="margin:0 0 10px;">${base}</p>
+          <ul class="callout-list" style="margin-top:10px;">
+            <li><span class="num">1</span><span>원문 데이터는 무엇인가?</span></li>
+            <li><span class="num">2</span><span>기대치는 이미 반영됐나?</span></li>
+            <li><span class="num">3</span><span>틀렸다는 숫자 기준은?</span></li>
+          </ul>
+        `;
+      });
+    }
+
+    async function init() {
+      renderProfile("stable");
+      renderVix(fallbackVix, "예시 데이터");
+      renderFearGreed(fallbackFearGreed, "예시 데이터");
+      setStatus("예시 데이터 표시, 실시간 확인 중", false);
+      setupInteractions();
+      const [vixLive, fgLive] = await Promise.all([loadVix(), loadFearGreed()]);
+      setStatus(vixLive || fgLive ? "일부 데이터 연동 완료" : "예시 데이터 표시 중", vixLive || fgLive);
+    }
+
+    init();
+  </script>
+</body>
+</html>
